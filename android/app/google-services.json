@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "921679506173",
+    "project_id": "fci-app-new-92a6f",
+    "storage_bucket": "fci-app-new-92a6f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:921679506173:android:fc315e1b78c17688d9ec94",
+        "android_client_info": {
+          "package_name": "com.example.fci_app_new"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBpVvlqXfQjggPvfvSrVbVYUu6GP2QOpTk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

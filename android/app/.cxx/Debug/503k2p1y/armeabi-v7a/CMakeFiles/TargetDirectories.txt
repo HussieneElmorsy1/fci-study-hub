@@ -1,0 +1,2 @@
+D:/Learning/Tharwat/fci_app_new/android/app/.cxx/Debug/503k2p1y/armeabi-v7a/CMakeFiles/edit_cache.dir
+D:/Learning/Tharwat/fci_app_new/android/app/.cxx/Debug/503k2p1y/armeabi-v7a/CMakeFiles/rebuild_cache.dir
