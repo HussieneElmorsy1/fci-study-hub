@@ -15,7 +15,7 @@ This app is designed to provide students with a complete set of academic and pro
 
 - **Flutter** for cross-platform mobile development
 - **Firebase** for backend services and user authentication
-- **State Management:** BLoC & Provider
+- **State Management:** GetX
 - **Rive** for animations
 
 ## Project Status 🚧
