@@ -19,7 +19,7 @@ class ForgotPasswordScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
             Text(
-              '2.1'.tr,// "استعادة كلمة المرور"
+              '2.1'.tr, // "استعادة كلمة المرور"
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 24,
@@ -29,7 +29,7 @@ class ForgotPasswordScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
             Text(
-              '2.2'.tr,// "يرجى إدخال ايميلك الجامعي لتلقي رمز التحقق"
+              '2.2'.tr, // "يرجى إدخال ايميلك الجامعي لتلقي رمز التحقق"
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 16,
@@ -37,9 +37,9 @@ class ForgotPasswordScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 32),
-            CustomFormTextField(
-              labelText: '1.2'.tr,// "البريد الالكتروني"
-              helperText: '1.4'.tr,// "مرحبا, من فضلك ادخل بريدك الالكتروني"
+            CustomTextFormField(
+              labelText: '1.2'.tr, // "البريد الالكتروني"
+              helperText: '1.4'.tr, // "مرحبا, من فضلك ادخل بريدك الالكتروني"
               keyboardType: TextInputType.emailAddress,
               icon: Icons.attach_email,
               obscureText: false,
@@ -48,17 +48,17 @@ class ForgotPasswordScreen extends StatelessWidget {
               },
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return '1.10'.tr;// "من فضلك ادخل بريدك الالكتروني"
+                  return '1.10'.tr; // "من فضلك ادخل بريدك الالكتروني"
                 }
                 if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                  return '1.11'.tr;// "ادخل بريد الكتروني صحيح"
+                  return '1.11'.tr; // "ادخل بريد الكتروني صحيح"
                 }
                 return null;
               },
             ),
             const SizedBox(height: 16),
             CustomBottom(
-              text: '2.3'.tr,//Send code"
+              text: '2.3'.tr, //Send code"
               onPressed: () {
                 Get.offNamed(AppRoutes.MAIN_HOME_SCREEN);
               },

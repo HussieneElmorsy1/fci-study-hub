@@ -5,7 +5,6 @@ import 'package:fci_app_new/presentation/screens/schedule_screen.dart';
 import 'package:fci_app_new/presentation/widgets/custom_bottom_nav_bar.dart';
 import 'package:fci_app_new/presentation/widgets/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
 class MainHomeScreen extends StatefulWidget {
   const MainHomeScreen({Key? key}) : super(key: key);
@@ -41,13 +40,11 @@ class _MainHomeScreenState extends State<MainHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Skeletonizer(
-        child: PageView(
-          controller: _pageController,
-          physics: ClampingScrollPhysics(),
-          onPageChanged: (index) => setState(() => _currentIndex = index),
-          children: _screens,
-        ),
+      body: PageView(
+        controller: _pageController,
+        physics: ClampingScrollPhysics(),
+        onPageChanged: (index) => setState(() => _currentIndex = index),
+        children: _screens,
       ),
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: _currentIndex,

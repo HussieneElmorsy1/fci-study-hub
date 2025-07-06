@@ -8,32 +8,28 @@ class Constants {
   static const Color pdfRedColor = Color(0xFFE53935);
   static const Color backgroundColor = Colors.white;
   static const Color tabBackgroundColor = Color(0xFFF5F5F5);
-  
+
   // Text Styles
   static const TextStyle headerTextStyle = TextStyle(
     fontSize: 18.0,
     fontWeight: FontWeight.bold,
     color: Colors.black,
-    fontFamily: 'Cairo',
   );
-  
+
   static const TextStyle tabTextStyle = TextStyle(
     fontSize: 14.0,
     fontWeight: FontWeight.w500,
-    fontFamily: 'Cairo',
   );
-  
+
   static const TextStyle pdfTitleTextStyle = TextStyle(
     fontSize: 12.0,
     fontWeight: FontWeight.w500,
     color: Colors.black,
-    fontFamily: 'Cairo',
   );
-  
+
   static const TextStyle pdfSubtitleTextStyle = TextStyle(
     fontSize: 10.0,
     color: Colors.black87,
-    fontFamily: 'Cairo',
   );
 
   // Tab titles
@@ -59,4 +55,8 @@ class Constants {
     {'title': 'اسم المستند', 'subtitle': ''},
     {'title': 'اسم المستند', 'subtitle': ''},
   ];
+
+  static const String baseUrl = "https://fcihub.onrender.com/";
+  // رابط بديل للاختبار إذا كان الرابط الأساسي غير متاح
+  static const String testBaseUrl = "https://fcihub.onrender.com/";
 }

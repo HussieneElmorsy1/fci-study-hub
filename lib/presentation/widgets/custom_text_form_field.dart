@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class CustomFormTextField extends StatelessWidget {
-  const CustomFormTextField({
+class CustomTextFormField extends StatelessWidget {
+  const CustomTextFormField({
     super.key,
     required this.labelText,
     required this.helperText,
@@ -12,6 +12,8 @@ class CustomFormTextField extends StatelessWidget {
     this.onChanged,
     this.validator,
     this.suffixIcon,
+    this.controller,
+    this.focusNode,
   });
 
   final String labelText;
@@ -22,6 +24,8 @@ class CustomFormTextField extends StatelessWidget {
   final Function(String)? onChanged;
   final String? Function(String?)? validator;
   final Widget? suffixIcon;
+  final TextEditingController? controller;
+  final FocusNode? focusNode;
 
   @override
   Widget build(BuildContext context) {
@@ -65,6 +69,8 @@ class CustomFormTextField extends StatelessWidget {
         ),
         // حقل الإدخال الفعلي
         TextFormField(
+          controller: controller,
+          focusNode: focusNode,
           validator: validator,
           style: GoogleFonts.poppins(
             color: Colors.grey.shade600,

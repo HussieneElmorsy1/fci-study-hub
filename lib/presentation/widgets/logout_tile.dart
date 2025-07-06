@@ -1,7 +1,9 @@
+// lib\presentation\widgets\logout_tile.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:fci_app_new/data/services/auth_service.dart';
-import '../../app_pages/app_routes.dart';
+// تم حذف: import 'package:fci_app_new/data/services/auth_service.dart'; // لم يعد هذا الملف موجودًا
+import 'package:fci_app_new/app_pages/app_routes.dart'; //
+import 'package:fci_app_new/presentation/controllers/auth_controller.dart'; // استيراد AuthController
 
 class LogoutTile extends StatelessWidget {
   const LogoutTile({super.key});
@@ -26,9 +28,10 @@ class LogoutTile extends StatelessWidget {
     );
 
     if (result == true) {
-      final authService = Get.find<AuthService>();
-      await authService.logout();
-      Get.offAllNamed(AppRoutes.LOGIN);  // بعد الخروج، العودة إلى شاشة تسجيل الدخول
+      // البحث عن AuthController لتشغيل عملية تسجيل الخروج
+      final authController = Get.find<AuthController>(); // استخدام AuthController بدلاً من AuthService
+      await authController.logout(); // استدعاء دالة logout() من AuthController
+      Get.offAllNamed(AppRoutes.LOGIN); // // بعد الخروج، العودة إلى شاشة تسجيل الدخول
     }
   }
 
@@ -37,7 +40,7 @@ class LogoutTile extends StatelessWidget {
     return ListTile(
       title: Text('6.6'.tr),
       leading: const Icon(Icons.exit_to_app),
-      onTap: () => _showLogoutDialog(context),  // عند الضغط على "تسجيل الخروج"
+      onTap: () => _showLogoutDialog(context), // عند الضغط على "تسجيل الخروج"
     );
   }
 }

@@ -1,54 +1,17 @@
-import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fci_app_new/app_pages/app_routes.dart';
-import 'package:fci_app_new/data/models/profile_model.dart';
-import 'package:fci_app_new/presentation/widgets/horizontal_line.dart';
-import 'package:fci_app_new/presentation/widgets/profile_item.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+// lib/presentation/screens/profile_screen.dart
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:fci_app_new/app_pages/app_routes.dart'; //
+import 'package:fci_app_new/presentation/widgets/horizontal_line.dart'; //
+import 'package:fci_app_new/presentation/widgets/profile_item.dart'; //
+import 'package:fci_app_new/presentation/controllers/profile_controller.dart'; //
+import 'package:fci_app_new/data/models/profile_model.dart'; //
+import 'package:fci_app_new/data/models/teacher_model.dart'; //
 
-class ProfileScreen extends StatefulWidget {
-  @override
-  _ProfileScreenState createState() => _ProfileScreenState();
-}
+class ProfileScreen extends StatelessWidget {
+  final ProfileController controller = Get.find<ProfileController>(); //
 
-class _ProfileScreenState extends State<ProfileScreen> {
-  late Future<ProfileModel> futureProfile;
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  @override
-  void initState() {
-    super.initState();
-    loadProfileData();
-  }
-
-  void loadProfileData() {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      setState(() {
-        futureProfile = _fetchUserProfile(user.uid);
-      });
-    } else {
-      setState(() {
-        futureProfile = Future.value(ProfileModel());
-      });
-    }
-  }
-
-  Future<ProfileModel> _fetchUserProfile(String userId) async {
-    try {
-      final doc = await _firestore.collection('students').doc(userId).get();
-      if (doc.exists) {
-        return ProfileModel.fromJson(doc.data()!);
-      }
-      return ProfileModel.loadProfile();
-    } catch (e) {
-      log("Error fetching profile: $e");
-      return ProfileModel.loadProfile();
-    }
-  }
+  ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -57,54 +20,54 @@ class _ProfileScreenState extends State<ProfileScreen> {
         title: Text('4.1'.tr),
         centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: loadProfileData,
-            tooltip: '4.2'.tr,
+          Obx(
+            () => IconButton(
+              icon: Icon(Icons.refresh, color: controller.isLoading.value ? Colors.grey : null),
+              onPressed: controller.isLoading.value ? null : controller.fetchProfile,
+              tooltip: '4.2'.tr,
+            ),
           ),
         ],
         leading: IconButton(
           icon: Icon(
-            Icons.arrow_forward,
+            Icons.arrow_back,
             color: Theme.of(context).iconTheme.color,
           ),
-          onPressed: () => Get.toNamed(AppRoutes.HOME_SCREEN),
+          onPressed: () => Get.back(),
         ),
       ),
-      body: FutureBuilder<ProfileModel>(
-        future: futureProfile,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('4.3'.tr),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: loadProfileData,
-                    child: Text('4.4'.tr),
-                  ),
-                ],
-              ),
-            );
-          } else if (snapshot.hasData) {
-            return buildProfileView(snapshot.data!);
-          } else {
-            return Center(child: Text('4.5'.tr));
-          }
-        },
-      ),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (controller.errorMessage.isNotEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('4.3'.tr + '\n${controller.errorMessage.value}', textAlign: TextAlign.center,),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: controller.fetchProfile,
+                  child: Text('4.4'.tr),
+                ),
+              ],
+            ),
+          );
+        } else if (controller.userProfile.value == null) {
+          return Center(child: Text('4.5'.tr)); // بيانات الملف الشخصي غير متوفرة
+        } else {
+          // عرض البيانات بناءً على نوع النموذج (طالب أو مدرس)
+          return buildProfileView(context, controller.userProfile.value);
+        }
+      }),
       extendBody: true,
     );
   }
 
-  Widget buildProfileView(ProfileModel profile) {
+  Widget buildProfileView(BuildContext context, dynamic profile) {
     return RefreshIndicator(
       onRefresh: () async {
-        loadProfileData();
+        await controller.fetchProfile();
       },
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -126,6 +89,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                     const SizedBox(height: 10),
+                    // عرض البريد الإلكتروني (موجود في كلا النموذجين)
                     Text(
                       profile.email,
                       style: TextStyle(
@@ -138,18 +102,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(height: 20),
               HorizontalLine(color: Theme.of(context).dividerColor),
-              ProfileItem(title: '4.6'.tr, value: profile.name),
-              ProfileItem(title: '4.7'.tr, value: profile.gender),
-              ProfileItem(title: '4.8'.tr, value: profile.college),
-              ProfileItem(title: '4.9'.tr, value: profile.university),
-              ProfileItem(title: '4.10'.tr, value: profile.level),
-              ProfileItem(title: '4.11'.tr, value: profile.specialization),
-              ProfileItem(title: '4.12'.tr, value: profile.degree),
-              ProfileItem(title: '4.13'.tr, value: profile.studentId),
-              ProfileItem(
-                title: '4.14'.tr,
-                value: profile.gpa.toStringAsFixed(1),
-              ),
+              // عرض الحقول المشتركة
+              ProfileItem(title: 'الاسم'.tr, value: profile.name),
+              ProfileItem(title: 'النوع'.tr, value: profile.gender),
+
+              // عرض الحقول الخاصة بالدور (طالب أو مدرس)
+              if (profile is ProfileModel) // إذا كان النموذج هو ProfileModel (طالب)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    ProfileItem(title: 'الكلية'.tr, value: profile.collage ?? 'غير متاح'.tr),
+                    ProfileItem(title: 'الجامعة'.tr, value: profile.university ?? 'غير متاح'.tr),
+                    ProfileItem(title: 'المستوى'.tr, value: profile.level),
+                    ProfileItem(title: 'التخصص'.tr, value: profile.major),
+                    ProfileItem(title: 'الرقم الجامعي'.tr, value: profile.universityId),
+                    ProfileItem(title: 'المعدل التراكمي'.tr, value: profile.gpa.toStringAsFixed(1)),
+                  ],
+                )
+              else if (profile is TeacherModel) // إذا كان النموذج هو TeacherModel (مدرس)
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // عرض الحقول المتاحة فقط في استجابة user/admin/profile
+                    ProfileItem(title: 'رقم المدرس'.tr, value: profile.teacherId),
+                    // حقول أخرى (القسم، الرتبة، المكتب) غير متوفرة في استجابة API الحالية
+                    ProfileItem(title: 'الكلية'.tr, value: 'غير متاح'.tr), // لا توجد كلية صراحة للمدرس في API
+                    ProfileItem(title: 'الجامعة'.tr, value: 'غير متاح'.tr), // لا توجد جامعة صراحة للمدرس في API
+                  ],
+                ),
             ],
           ),
         ),

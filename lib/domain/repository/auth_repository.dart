@@ -1,26 +1,12 @@
-// address: lib/domain/repository/auth_repository.dart
-import 'package:firebase_auth/firebase_auth.dart';
-
+// lib/domain/repository/auth_repository.dart
 abstract class AuthRepository {
-  Future<User?> loginWithEmail(String email, String password);
-  Future<User?> loginWithMicrosoft();
+  // تحديث دالة loginWithEmail لقبول الدور
+  Future<bool> loginWithEmail(String email, String password, String role);
   Future<void> logout();
-  Stream<User?> authStateChanges();
+  Future<bool> resetPassword(String email);
+  Future<bool> verifyOtp(String email, String otp);
+  Future<bool> createNewPassword(String email, String newPassword);
+  Future<Map<String, dynamic>> getCurrentUser();
+  Future<String?> getAuthToken();
+  Future<String?> getUserRole(); // دالة جديدة للحصول على الدور المخزن
 }
-//   Future<String?> getEmail();
-//   Future<void> saveEmail(String email);
-//   Future<void> deleteEmail();
-//   bool isLoggedIn();
-//   String getUserId();
-//   String getUserName();
-//   String getUserEmail();
-//   String getUserPhotoUrl();
-//   String getStudentId();
-//   String getGender();
-//   String getCollege();
-//   String getUniversity();
-//   String getLevel();
-//   String getSpecialization();
-//   String getDegree();
-//   double getGPA();
-// }

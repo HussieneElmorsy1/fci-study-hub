@@ -1,144 +1,75 @@
-import 'package:fci_app_new/app_pages/app_routes.dart';
-import 'package:fci_app_new/data/services/auth_service.dart';
-import 'package:fci_app_new/domain/repository/auth_repository.dart';
-import 'package:fci_app_new/domain/use_case/sign_in_with_microsoft.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+// lib/presentation/controllers/login_controller.dart
+import 'package:fci_app_new/app_pages/app_routes.dart'; //
+import 'package:fci_app_new/data/api/api_service.dart'; //
+import 'package:fci_app_new/domain/usecases/login_user.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart'; // لم يعد مطلوبًا هنا لأن AuthRepositoryImpl يتعامل مع حفظ البيانات
 import 'dart:developer' as developer;
 
+// هذه الاستثناءات مُعرفة في lib/data/api/api_service.dart
+import 'package:fci_app_new/data/api/api_service.dart'; //
+
+
 class LoginController extends GetxController {
-  final formKey = GlobalKey<FormState>();
-  final isLoading = false.obs;
-  final email = ''.obs;
-  final password = ''.obs;
-  final textColor = Colors.black.obs;
-  final isPasswordVisible = false.obs;
-  final AuthService _authService = Get.find();
-  late final SignInWithMicrosoft _signInWithMicrosoft;
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final RxBool isLoading = false.obs;
+  final RxString email = ''.obs;
+  final RxString password = ''.obs;
+  final Rx<Color> textColor = Colors.black.obs;
+  final RxBool isPasswordVisible = false.obs;
+
+  final LoginUser _loginUser; //
+
+  LoginController(this._loginUser);
 
   @override
   void onInit() {
     super.onInit();
-    _signInWithMicrosoft = SignInWithMicrosoft(Get.find<AuthRepository>());
   }
 
-  Future<void> login() async {
+  // تم تعديل دالة login لقبول معامل 'role'
+  Future<bool> login(String email, String password, String role) async {
     if (formKey.currentState!.validate()) {
       isLoading.value = true;
       try {
-        final user = await _authService.login(email.value, password.value);
-        if (user != null) {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setBool('isLoggedIn', true);
-          await prefs.setString('userEmail', user.email ?? '');
-          await prefs.setString('userId', user.uid);
-          developer.log('LoginController - Saved to SharedPreferences: isLoggedIn=true, userEmail=${user.email}, userId=${user.uid}');
+        // استدعاء الـ Use Case مع تمرير الدور
+        final bool success = await _loginUser.call(email, password, role); //
 
-          Get.offAllNamed(AppRoutes.MAIN_HOME_SCREEN);
-          developer.log('LoginController - Navigated to MainHomeScreen');
+        if (success) {
+          // لم نعد نحتاج للوصول إلى userData['token'] هنا، لأن حفظ البيانات يتم في AuthRepositoryImpl
+          developer.log('LoginController - Login successful, data saved by AuthRepositoryImpl.');
+          // التوجيه إلى الشاشة الرئيسية سيتم في الواجهة (login_screen.dart) بعد استدعاء controller.login
+          // أو يمكن إضافته هنا إذا كنت تفضل أن يتحكم المتحكم في التوجيه بعد النجاح
+          // Get.offAllNamed(AppRoutes.MAIN_HOME_SCREEN);
+          return true;
         } else {
           Get.snackbar('Error', 'Failed to sign in. Please check your credentials.');
-          developer.log('LoginController - Login failed: user is null');
+          developer.log('LoginController - Login failed: Use Case returned false.');
+          return false;
         }
-      } on FirebaseAuthException catch (e) {
-        String errorMessage;
-        switch (e.code) {
-          case 'user-not-found':
-            errorMessage = 'No user found for that email.';
-            break;
-          case 'wrong-password':
-            errorMessage = 'Wrong password provided.';
-            break;
-          case 'invalid-email':
-            errorMessage = 'The email address is badly formatted.';
-            break;
-          case 'user-disabled':
-            errorMessage = 'This user account has been disabled.';
-            break;
-          default:
-            errorMessage = 'An error occurred: ${e.message}';
-        }
-        Get.snackbar('Login Error', errorMessage);
-        developer.log('LoginController - FirebaseAuthException: $errorMessage');
       } catch (e) {
-        Get.snackbar('Error', 'An unexpected error occurred: ${e.toString()}');
+        String errorMessage = 'An unexpected error occurred: ${e.toString()}';
+        // يتم التعامل مع هذه الاستثناءات المعرفة في lib/data/api/api_service.dart
+        if (e is ApiException) { //
+          errorMessage = 'API Error (${e.statusCode}): ${e.message}';
+        } else if (e is NetworkException) { //
+          errorMessage = 'Network Error: ${e.message}';
+        } else if (e is UnauthorizedException) { //
+          errorMessage = 'Authentication Error: ${e.message}';
+        }
+        Get.snackbar('Error', errorMessage, duration: const Duration(seconds: 5));
         developer.log('LoginController - Unexpected error: $e');
+        return false;
       } finally {
         isLoading.value = false;
         developer.log('LoginController - isLoading set to false');
       }
     }
+    return false; // في حالة فشل التحقق من صحة النموذج
   }
 
   void navigateToForgotPassword() {
-    Get.toNamed(AppRoutes.FORGOT_PASSWORD);
-  }
-
-  Future<void> signInWithMicrosoft() async {
-    try {
-      isLoading.value = true;
-      developer.log('LoginController - Attempting to sign in with Microsoft...');
-      final user = await _signInWithMicrosoft();
-      if (user != null) {
-        developer.log('LoginController - Microsoft sign-in successful. User: ${user.email}, UID: ${user.uid}');
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setBool('isLoggedIn', true);
-        await prefs.setString('userEmail', user.email ?? '');
-        await prefs.setString('userId', user.uid);
-        developer.log('LoginController - Saved to SharedPreferences: isLoggedIn=true, userEmail=${user.email}, userId=${user.uid}');
-
-        Get.offAllNamed(AppRoutes.MAIN_HOME_SCREEN);
-        developer.log('LoginController - Navigated to MainHomeScreen');
-      } else {
-        Get.snackbar('Error', 'Failed to sign in with Microsoft. Please try again.');
-        developer.log('LoginController - Microsoft sign-in failed: user is null');
-      }
-    } on FirebaseAuthException catch (e) {
-      String errorMessage;
-      switch (e.code) {
-        case 'account-exists-with-different-credential':
-          errorMessage = 'An account already exists with a different credential.';
-          break;
-        case 'invalid-credential':
-          errorMessage = 'Invalid credentials provided.';
-          break;
-        case 'user-disabled':
-          errorMessage = 'This user account has been disabled.';
-          break;
-        case 'operation-not-allowed':
-          errorMessage = 'Microsoft sign-in is not enabled.';
-          break;
-        case 'invalid-email':
-          errorMessage = 'The email address is badly formatted.';
-          break;
-        case 'user-not-found':
-          errorMessage = 'No user found for that email.';
-          break;
-        case 'wrong-password':
-          errorMessage = 'Wrong password provided.';
-          break;
-        case 'credential-already-in-use':
-          errorMessage = 'This credential is already associated with a different user account.';
-          break;
-        case 'network-request-failed':
-          errorMessage = 'Network error. Please check your internet connection.';
-          break;
-        case 'invalid-request-method':
-          errorMessage = 'The Microsoft endpoint only accepts POST requests. Please check your Microsoft Azure configuration.';
-          break;
-        default:
-          errorMessage = 'An error occurred: ${e.message}';
-      }
-      Get.snackbar('Microsoft Sign-In Error', errorMessage, duration: const Duration(seconds: 5));
-      developer.log('LoginController - FirebaseAuthException: $errorMessage');
-    } catch (e) {
-      Get.snackbar('Error', 'An unexpected error occurred: ${e.toString()}', duration: const Duration(seconds: 5));
-      developer.log('LoginController - Unexpected error: $e');
-    } finally {
-      isLoading.value = false;
-      developer.log('LoginController - isLoading set to false');
-    }
+    Get.toNamed(AppRoutes.FORGOT_PASSWORD); //
   }
 }

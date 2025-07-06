@@ -71,6 +71,12 @@ class MyLocale implements Translations {
           '4.19': 'الفرقه الرابعة',
           '4.20': 'نظم المعلومات',
           '4.21': 'البكالريوس',
+          '4.22': 'القسم',
+          '4.23': 'الرتبة',
+          '4.24': 'موقع المكتب',
+          '4.25': 'رقم المدرس',
+          '4.26': 'مدرس',
+          '4.27': 'غير متاح',
           // Onboarding Screen
           '5.1': 'مرحبا بكم في كلية الحاسبات والمعلومات',
           '5.2': 'نقدم لكم منصه تعليميه متكامله',
@@ -109,7 +115,8 @@ class MyLocale implements Translations {
           '1.14': 'Login button pressed.',
           // Forgot Password Screen
           '2.1': 'Recover your password',
-          '2.2': 'Please enter your university email to receive the verification code',
+          '2.2':
+              'Please enter your university email to receive the verification code',
           '2.3': 'Send code',
           // Home Screen
           '3.1': 'Faculty of Computers and Information',
@@ -159,6 +166,12 @@ class MyLocale implements Translations {
           '4.19': 'Fourth Year',
           '4.20': 'Information Systems',
           '4.21': 'Bachelor',
+          '4.22': 'Department',
+          '4.23': 'Rank',
+          '4.24': 'Office Location',
+          '4.25': 'Teacher ID',
+          '4.26': 'Teacher',
+          '4.27': 'Not Available',
           // Onboarding Screen
           '5.1': 'Welcome to the Faculty of Computers and Information',
           '5.2': 'We offer you an integrated educational platform',

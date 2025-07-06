@@ -1,74 +1,66 @@
+// lib/main.dart
 import 'dart:developer';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fci_app_new/app_pages/app_pages.dart';
-import 'package:fci_app_new/app_pages/app_routes.dart';
+import 'package:cloud_firestore/cloud_firestore.dart'; // (متبقي لميزات أخرى مثل الدردشة)
+import 'package:fci_app_new/app_pages/app_pages.dart'; //
+import 'package:fci_app_new/app_pages/app_routes.dart'; //
+import 'package:fci_app_new/data/api/api_service.dart'; //
 import 'package:fci_app_new/data/data_sources/remote/auth_remote_data_source.dart';
-import 'package:fci_app_new/data/providers/document_provider.dart';
-import 'package:fci_app_new/data/services/auth_service.dart';
-import 'package:fci_app_new/domain/repository/auth_repository.dart';
-import 'package:fci_app_new/domain/repository/auth_repository_impl.dart';
-import 'package:fci_app_new/domain/repository/settings_repository_impl.dart';
-import 'package:fci_app_new/presentation/controllers/auth_controller.dart';
-import 'package:fci_app_new/presentation/controllers/login_controller.dart';
-import 'package:fci_app_new/presentation/screens/login_screen.dart';
-import 'package:fci_app_new/presentation/screens/main_home_screen.dart';
-import 'package:fci_app_new/presentation/screens/splash_screen.dart';
-import 'package:fci_app_new/core/utils/app_initializer.dart';
-import 'package:fci_app_new/core/utils/app_theme.dart';
-import 'package:fci_app_new/data/data_sources/locale/locale.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:fci_app_new/data/providers/document_provider.dart'; //
+// تم حذف: import 'package:fci_app_new/data/services/auth_service.dart';
+import 'package:fci_app_new/domain/repository/auth_repository.dart'; //
+import 'package:fci_app_new/domain/repository/auth_repository_impl.dart'; //
+import 'package:fci_app_new/domain/repository/profile_repository_impl.dart';
+import 'package:fci_app_new/domain/repository/settings_repository_impl.dart'; //
+import 'package:fci_app_new/domain/usecases/login_user.dart';
+import 'package:fci_app_new/presentation/controllers/auth_controller.dart'; //
+import 'package:fci_app_new/presentation/controllers/login_controller.dart'; //
+import 'package:fci_app_new/presentation/controllers/profile_controller.dart'; // // استيراد ProfileController
+import 'package:fci_app_new/domain/repository/profile_repository.dart'; // // استيراد ProfileRepository
+import 'package:fci_app_new/presentation/screens/main_home_screen.dart'; //
+import 'package:fci_app_new/presentation/screens/splash_screen.dart'; //
+import 'package:fci_app_new/core/utils/app_initializer.dart'; //
+import 'package:fci_app_new/core/utils/app_theme.dart'; //
+import 'package:fci_app_new/data/data_sources/locale/locale.dart'; //
+import 'package:firebase_auth/firebase_auth.dart'; // (متبقي لميزات أخرى مثل الدردشة)
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'core/firebase_options.dart';
-import 'data/providers/settings_provider.dart';
+import 'core/firebase_options.dart'; //
+import 'data/providers/settings_provider.dart'; //
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   if (Firebase.apps.isEmpty) {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-}
-
-
-  // ضبط الـ Persistence لـ Firebase Auth
-  if (GetPlatform.isWeb) {
-    await FirebaseAuth.instance.setPersistence(Persistence.LOCAL);
+    await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform);
   }
-
-  // التأكد من أن Firebase Auth جاهز
-  await FirebaseAuth.instance.authStateChanges().first;
 
   final sharedPreferences = await SharedPreferences.getInstance();
   final isFirstRun = await AppInitializer.isFirstRun();
   final isLoggedIn = sharedPreferences.getBool('isLoggedIn') ?? false;
-  log('Main.dart - isLoggedIn: $isLoggedIn');
-  log('Main.dart - Firebase currentUser: ${FirebaseAuth.instance.currentUser?.uid}');
+  log('Main.dart - isLoggedIn (from SharedPreferences): $isLoggedIn');
 
-  // Dependency Injection
-  Get.lazyPut<AuthRemoteDataSource>(() => AuthRemoteDataSource());
-  Get.lazyPut<AuthRepository>(() => AuthRepositoryImpl(Get.find()));
-  Get.lazyPut<AuthService>(() => AuthService(Get.find()));
-  Get.lazyPut<AuthController>(() => AuthController(Get.find()));
-  Get.lazyPut<LoginController>(() => LoginController());
+  // Dependency Injection for API-based authentication
+  Get.lazyPut<ApiService>(() => ApiService());
+  Get.lazyPut<AuthRemoteDataSource>(
+      () => AuthRemoteDataSource(Get.find<ApiService>()));
+  Get.lazyPut<AuthRepository>(
+      () => AuthRepositoryImpl(Get.find<AuthRemoteDataSource>()));
+  Get.lazyPut<LoginUser>(() => LoginUser(Get.find<AuthRepository>()));
+  Get.lazyPut<AuthController>(
+      () => AuthController(Get.find<LoginUser>(), Get.find<AuthRepository>()));
+  Get.lazyPut<ProfileController>(() => ProfileController(
+      Get.find<ProfileRepository>(), Get.find<AuthRepository>()));
 
-   // تحديث حالة المستخدم (أونلاين/أوفلاين)
-  FirebaseAuth.instance.authStateChanges().listen((User? user) {
-    if (user != null) {
-      FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-        'isOnline': true,
-        'lastSeen': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
+  // تسجيل ProfileRepositoryImpl
+  Get.lazyPut<ProfileRepository>(
+      () => ProfileRepositoryImpl(Get.find<ApiService>()));
 
-      // لما المستخدم يقفل التطبيق، يتحدث حالته لأوفلاين
-      FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-        'isOnline': false,
-        'lastSeen': FieldValue.serverTimestamp(),
-      }, SetOptions(merge: true));
-    }
-  });
+  // لا نحتاج لـ lazyPut ProfileController هنا، سيتم تهيئته عبر ProfileBinding
+  // Get.lazyPut<ProfileController>(() => ProfileController(Get.find<ProfileRepository>(), Get.find<AuthRepository>()));
 
   runApp(
     MultiProvider(
@@ -98,6 +90,13 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final settingsProvider = Provider.of<SettingsProvider>(context);
 
+    String initialRoute = AppRoutes.SPLASH;
+    if (!isFirstRun && !isLoggedIn) {
+      initialRoute = AppRoutes.ROLE_SELECTION;
+    } else if (isLoggedIn) {
+      initialRoute = AppRoutes.MAIN_HOME_SCREEN;
+    }
+
     return GetMaterialApp(
       locale: Get.deviceLocale,
       translations: MyLocale(),
@@ -109,7 +108,7 @@ class MyApp extends StatelessWidget {
       themeMode: settingsProvider.settings?.isDarkMode ?? false
           ? ThemeMode.dark
           : ThemeMode.light,
-      initialRoute: AppRoutes.SPLASH,
+      initialRoute: initialRoute,
       getPages: AppPages.routes,
     );
   }

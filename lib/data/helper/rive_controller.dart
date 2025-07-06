@@ -19,7 +19,7 @@ class RiveAnimationControllerHelper {
   RiveAnimationControllerHelper._internal();
 
   Artboard? _riveArtboard;
-  
+
   late RiveAnimationController _controllerIdle;
   late RiveAnimationController _controllerHandsUp;
   late RiveAnimationController _controllerHandsDown;
@@ -39,22 +39,42 @@ class RiveAnimationControllerHelper {
   }
 
   void addDownLeftController() {
-    addController(_controllerLookDownLeft);
-    isLookingLeft = true;
+    if (_riveArtboard != null) {
+      addController(_controllerLookDownLeft);
+      isLookingLeft = true;
+    }
   }
 
   void addDownRightController() {
-    addController(_controllerLookDownRight);
-    isLookingRight = true;
+    if (_riveArtboard != null) {
+      addController(_controllerLookDownRight);
+      isLookingRight = true;
+    }
   }
 
-  void addFailController() => addController(_controllerFail);
+  void addFailController() {
+    if (_riveArtboard != null) {
+      addController(_controllerFail);
+    }
+  }
 
-  void addHandsDownController() => addController(_controllerHandsDown);
+  void addHandsDownController() {
+    if (_riveArtboard != null) {
+      addController(_controllerHandsDown);
+    }
+  }
 
-  void addHandsUpController() => addController(_controllerHandsUp);
+  void addHandsUpController() {
+    if (_riveArtboard != null) {
+      addController(_controllerHandsUp);
+    }
+  }
 
-  void addSuccessController() => addController(_controllerSuccess);
+  void addSuccessController() {
+    if (_riveArtboard != null) {
+      addController(_controllerSuccess);
+    }
+  }
 
   Future<void> loadRiveFile(String assetPath) async {
     final data = await rootBundle.load(assetPath);

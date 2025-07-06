@@ -1,99 +1,46 @@
-import 'dart:developer';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:fci_app_new/core/utils/string_utils.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:get/get.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// lib/data/models/profile_model.dart
+import 'package:get/get.dart'; // Still for '.tr' if used for translation
 
 class ProfileModel {
   final String email;
   final String name;
   final String gender;
-  final String college;
+  final String collage;
   final String university;
   final String level;
-  final String specialization;
-  final String degree;
-  final String studentId;
+  final String major;
   final double gpa;
+  final String universityId; // This will now map to the 'id' from API response
 
   ProfileModel({
-    String? email,
-    String? name,
-    String? gender,
-    String? college,
-    String? university,
-    String? level,
-    String? specialization,
-    String? degree,
-    String? studentId,
-    double? gpa,
-  })  : email = email ?? 'UGS.141170@ci.suez.edu.eg',
-        name = name ?? '4.15'.tr,
-        gender = gender ?? '4.16'.tr,
-        college = college ?? '4.17'.tr,
-        university = university ?? '4.18'.tr,
-        level = level ?? '4.19'.tr,
-        specialization = specialization ?? '4.20'.tr,
-        degree = degree ?? '4.21'.tr,
-        studentId = studentId ?? '124765',
-        gpa = gpa ?? 4.5;
-
-  static Future<ProfileModel> loadProfile() async {
-    try {
-      final User? user = FirebaseAuth.instance.currentUser;
-      final prefs = await SharedPreferences.getInstance();
-
-      String? email = user?.email ?? prefs.getString('userEmail');
-      String? name = user?.displayName;
-      String studentId = '';
-
-      if (user != null) {
-        if (user.providerData.any((info) => info.providerId == 'microsoft.com')) {
-          studentId = extractStudentId(email ?? '');
-        } else {
-          studentId = prefs.getString('studentId') ?? '124765';
-        }
-
-        final doc = await FirebaseFirestore.instance
-            .collection('students')
-            .doc(user.uid)
-            .get();
-
-        if (doc.exists) {
-          return ProfileModel.fromJson({
-            ...doc.data()!,
-            'email': email ?? doc.data()!['email'],
-            'name': name ?? doc.data()!['name'],
-            'studentId': studentId,
-          });
-        }
-      }
-
-      return ProfileModel(
-        email: email,
-        name: name,
-        studentId: studentId,
-      );
-    } catch (e) {
-      log('Error loading profile: $e');
-      return ProfileModel();
-    }
-  }
+    required this.email,
+    required this.name,
+    required this.gender,
+    required this.collage,
+    required this.university,
+    required this.level,
+    required this.major,
+    required this.gpa,
+    required this.universityId,
+  });
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
+    // Access the nested 'userData' object
+    final userData = json['userData'] as Map<String, dynamic>?;
+
+    // Provide default values if userData is null or fields are missing
     return ProfileModel(
-      email: json['email'] ?? 'UGS.141170@ci.suez.edu.eg',
-      name: json['name'] ?? '4.15'.tr,
-      gender: json['gender'] ?? '4.16'.tr,
-      college: json['college'] ?? '4.17'.tr,
-      university: json['university'] ?? '4.18'.tr,
-      level: json['level'] ?? '4.19'.tr,
-      specialization: json['specialization'] ?? '4.20'.tr,
-      degree: json['degree'] ?? '4.21'.tr,
-      studentId: json['studentId'] ?? '124765',
-      gpa: json['gpa']?.toDouble() ?? 4.5,
+      email: userData?['email'] ?? 'default@example.com',
+      name: userData?['name'] ?? 'N/A'.tr,
+      gender: userData?['gender'] ?? 'N/A'.tr,
+      collage: userData?['collage'] ?? 'N/A'.tr,
+      university: userData?['university'] ?? 'N/A'.tr,
+      level: userData?['level']?.toString() ?? 'N/A'.tr, // Ensure it's a string, API sends "4"
+      major: userData?['major'] ?? 'N/A'.tr,
+      // Parse 'GPA' string to double. Handle null or invalid format.
+      gpa: double.tryParse(userData?['GPA'] ?? '') ?? 0.0,
+      // Map API's 'id' to universityId in ProfileModel
+      universityId: userData?['id']?.toString() ?? '',
     );
   }
 
@@ -102,13 +49,12 @@ class ProfileModel {
       'email': email,
       'name': name,
       'gender': gender,
-      'college': college,
+      'collage': collage,
       'university': university,
       'level': level,
-      'specialization': specialization,
-      'degree': degree,
-      'studentId': studentId,
+      'major': major,
       'gpa': gpa,
+      'universityId': universityId, // This would be 'id' if sending to API
     };
   }
 }

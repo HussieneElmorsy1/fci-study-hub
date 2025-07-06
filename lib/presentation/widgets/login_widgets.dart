@@ -24,7 +24,7 @@ class EmailField extends StatelessWidget {
 
     return Column(
       children: [
-        CustomFormTextField(
+        CustomTextFormField(
           labelText: '1.2'.tr,
           helperText: '1.4'.tr,
           keyboardType: TextInputType.emailAddress,
@@ -34,9 +34,13 @@ class EmailField extends StatelessWidget {
           onChanged: (value) {
             controller.email.value = value;
             // Rive Animation Logic
-            if (value.isNotEmpty && value.length <= 13 && !riveHelper.isLookingLeft) {
+            if (value.isNotEmpty &&
+                value.length <= 13 &&
+                !riveHelper.isLookingLeft) {
               riveHelper.addDownLeftController();
-            } else if (value.isNotEmpty && value.length > 13 && !riveHelper.isLookingRight) {
+            } else if (value.isNotEmpty &&
+                value.length > 13 &&
+                !riveHelper.isLookingRight) {
               riveHelper.addDownRightController();
             } else if (value.isEmpty) {
               riveHelper.addDownLeftController();
@@ -44,7 +48,8 @@ class EmailField extends StatelessWidget {
           },
           validator: (value) {
             if (value == null || value.isEmpty) return '1.10'.tr;
-            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) return '1.11'.tr;
+            if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value))
+              return '1.11'.tr;
             return null;
           },
         ),
@@ -74,7 +79,7 @@ class PasswordField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(
-      () => CustomFormTextField(
+      () => CustomTextFormField(
         labelText: '1.3'.tr,
         helperText: '1.5'.tr,
         keyboardType: TextInputType.visiblePassword,

@@ -41,4 +41,6 @@ abstract class AppRoutes {
   static const String CHATS = '/chats';
   /// The chat screen route.
   static const String CHAT = '/chat';
+  /// The role selection screen route.
+  static const String ROLE_SELECTION = '/role_selection';
 }
