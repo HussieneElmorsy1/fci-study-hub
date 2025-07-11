@@ -1,5 +1,5 @@
 // lib/domain/repository/auth_repository_impl.dart
-import 'package:fci_app_new/data/data_sources/remote/auth_remote_data_source.dart'; //
+import 'package:fci_app_new/data/datasources/remote/auth_remote_data_source.dart'; //
 import 'package:fci_app_new/domain/repository/auth_repository.dart'; //
 import 'package:shared_preferences/shared_preferences.dart';
 

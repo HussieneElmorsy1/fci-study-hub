@@ -1,3 +1,4 @@
+// lib/presentation/screens/video_screen.dart
 import 'package:fci_app_new/data/providers/document_provider.dart';
 import 'package:fci_app_new/presentation/widgets/video_player_screen.dart';
 import 'package:flutter/material.dart';

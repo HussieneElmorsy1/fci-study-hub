@@ -26,6 +26,24 @@ class AppTextStyles {
     color: Color(0xFF0C8CE9),
   );
 
+  static TextStyle bodyTextBold = GoogleFonts.cairo(
+    fontSize: 16,
+    fontWeight: FontWeight.bold,
+    color: Colors.black,
+  );
+
+  static TextStyle bodyTextSmall = GoogleFonts.cairo(
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+    color: Colors.black87,
+  );
+
+  static TextStyle headline3 = GoogleFonts.cairo(
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+    color: Colors.black,
+  );
+
   static const TextStyle caption = TextStyle(
     fontSize: 16,
     fontStyle: FontStyle.italic,
@@ -35,8 +53,8 @@ class AppTextStyles {
 //*********COLORS********** */
 
 class AppColors {
-  static const Color kPrimaryColor = Color(0xFF1E88E5);
-  static const Color accentColor = Color(0xFFF5C33B);
+  static const Color primary = Color(0xFF1E88E5);
+  static const Color secondary = Color(0xFFF5C33B);
   static const Color backgroundColor = Color(0xFFF7F8FA);
   static const Color textColor = Color.fromARGB(255, 255, 219, 219);
   static const Color white = Colors.white;

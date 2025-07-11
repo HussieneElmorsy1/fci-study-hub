@@ -61,8 +61,12 @@ class RoleSelectionScreen extends StatelessWidget {
       children: [
         Text('التعليم العالي في مصر'.tr, style: AppTextStyles.headline1), //
         const SizedBox(height: 5),
-        Text('جامعة قناة السويس'.tr, style: AppTextStyles.bodyText.copyWith(color: AppColors.kPrimaryColor)), //
-        Text('كلية الحاسبات والمعلومات'.tr, style: AppTextStyles.bodyText.copyWith(color: AppColors.kPrimaryColor)), //
+        Text('جامعة قناة السويس'.tr,
+            style:
+                AppTextStyles.bodyText.copyWith(color: AppColors.primary)), //
+        Text('كلية الحاسبات والمعلومات'.tr,
+            style:
+                AppTextStyles.bodyText.copyWith(color: AppColors.primary)), //
       ],
     );
   }
@@ -75,11 +79,14 @@ class RoleSelectionScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRoleButton(BuildContext context, {required String text, required String role, required VoidCallback onPressed}) {
+  Widget _buildRoleButton(BuildContext context,
+      {required String text,
+      required String role,
+      required VoidCallback onPressed}) {
     return ElevatedButton(
       onPressed: onPressed,
       style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.kPrimaryColor, //
+        backgroundColor: AppColors.primary, //
         padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
@@ -88,7 +95,7 @@ class RoleSelectionScreen extends StatelessWidget {
       ),
       child: Text(
         text,
-        style:  AppTextStyles.bodyText.copyWith(color: AppColors.accentColor), //
+        style: AppTextStyles.bodyText.copyWith(color: AppColors.secondary), //
       ),
     );
   }

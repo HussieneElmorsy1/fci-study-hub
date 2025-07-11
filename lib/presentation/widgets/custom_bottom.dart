@@ -19,7 +19,7 @@ class CustomBottom extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.kPrimaryColor,
+          backgroundColor: AppColors.primary,
           padding: const EdgeInsets.symmetric(vertical: 16),
           textStyle: GoogleFonts.poppins(
             fontSize: 18,

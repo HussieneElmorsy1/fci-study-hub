@@ -1,3 +1,5 @@
+// lib/app_pages/app_routes.dart
+
 /// This class defines the routes used in the application.
 abstract class AppRoutes {
   /// The splash screen route.
@@ -37,10 +39,22 @@ abstract class AppRoutes {
 
   /// The video screen route.
   static const String VIDEO_SCREEN = '/video_screen';
+
   /// The chats screen route.
   static const String CHATS = '/chats';
+
   /// The chat screen route.
   static const String CHAT = '/chat';
+
   /// The role selection screen route.
   static const String ROLE_SELECTION = '/role_selection';
+
+  /// The lecture schedule screen route.
+  static const LECTURE_SCHEDULE = '/lecture_schedule';
+
+  /// The courses list screen route.
+  static const COURSES_LIST = '/courses_list';
+
+  /// The material viewer screen route.
+  static const MATERIAL_VIEWER = '/material_viewer';
 }

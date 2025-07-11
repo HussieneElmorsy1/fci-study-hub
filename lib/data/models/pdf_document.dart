@@ -1,3 +1,4 @@
+// lib/data/models/pdf_document.dart
 class PdfDocument {
   final String id;
   final String title;

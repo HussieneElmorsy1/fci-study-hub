@@ -50,15 +50,15 @@ dependencies:
   permission_handler: ^12.0.0+1
   provider: ^6.0.5
   rive: ^0.13.20
-  share_plus: ^10.1.4
+  share_plus: ^11.0.0
   shared_preferences: ^2.5.3
   smooth_page_indicator: ^1.2.1
-  syncfusion_flutter_pdfviewer: ^29.1.38
+  syncfusion_flutter_pdfviewer: ^30.1.38
   video_player: ^2.9.5
 
 dev_dependencies:
   flutter_ar_json_extractor: ^0.0.6
-  flutter_lints: ^4.0.0
+  flutter_lints: ^6.0.0
   flutter_test:
     sdk: flutter
 
@@ -83,6 +83,7 @@ flutter:
     - assets/videos/
     - assets/fonts/
     - assets/animation/
+    - assets/images/lecture_schedule_screen/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

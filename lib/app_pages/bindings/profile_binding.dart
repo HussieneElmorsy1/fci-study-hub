@@ -2,7 +2,7 @@
 import 'package:fci_app_new/domain/repository/profile_repository_impl.dart';
 import 'package:get/get.dart';
 import 'package:fci_app_new/data/api/api_service.dart'; //
-import 'package:fci_app_new/data/data_sources/remote/auth_remote_data_source.dart'; //
+import 'package:fci_app_new/data/datasources/remote/auth_remote_data_source.dart'; //
 import 'package:fci_app_new/domain/repository/auth_repository.dart'; //
 import 'package:fci_app_new/domain/repository/auth_repository_impl.dart'; //
 import 'package:fci_app_new/domain/repository/profile_repository.dart'; //

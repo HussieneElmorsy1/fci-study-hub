@@ -1,3 +1,4 @@
+// lib/data/models/video.dart
 class Video {
   final String id;
   final String title;

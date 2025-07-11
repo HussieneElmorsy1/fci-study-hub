@@ -1,5 +1,5 @@
 // lib/app_pages/bindings/auth_binding.dart
-import 'package:fci_app_new/data/data_sources/remote/auth_remote_data_source.dart'; //
+import 'package:fci_app_new/data/datasources/remote/auth_remote_data_source.dart'; //
 // تم تصحيح المسار ليتوافق مع مكان ملف LoginUser في مجلد 'auth'
 import 'package:fci_app_new/domain/usecases/login_user.dart';
 import 'package:get/get.dart';

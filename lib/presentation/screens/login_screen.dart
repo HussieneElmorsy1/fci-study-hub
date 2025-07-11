@@ -14,7 +14,6 @@ import 'package:fci_app_new/core/utils/app_theme.dart'; // لـ AppColors
 // import 'package:fci_app_new/presentation/widgets/custom_text_field.dart';
 // import 'package:fci_app_new/presentation/widgets/custom_button.dart';
 
-
 class LoginScreen extends StatelessWidget {
   // الحصول على المتحكم عبر Get.find() لأنه سيتم تهيئته بواسطة الـ Binding
   final LoginController _controller = Get.find<LoginController>(); //
@@ -27,41 +26,52 @@ class LoginScreen extends StatelessWidget {
   LoginScreen({super.key}); //
 
   @override //
-  Widget build(BuildContext context) { //
+  Widget build(BuildContext context) {
+    //
     // استلام الدور المختار من الـ arguments
     final String? role = Get.arguments;
     // يمكنك استخدام 'user' كقيمة افتراضية إذا لم يتم تمرير دور
     final String actualRole = role ?? 'user';
 
-    return Obx(() => ModalProgressHUD( //
+    return Obx(() => ModalProgressHUD(
+          //
           inAsyncCall: _controller.isLoading.value, //
-          child: Scaffold( //
+          child: Scaffold(
+            //
             backgroundColor: AppColors.white, //
-            body: Form( //
+            body: Form(
+              //
               key: _controller.formKey, //
-              child: SingleChildScrollView( //
-                child: Center( //
-                  child: Padding( //
+              child: SingleChildScrollView(
+                //
+                child: Center(
+                  //
+                  child: Padding(
+                    //
                     padding: const EdgeInsets.symmetric(horizontal: 12), //
-                    child: Column( //
+                    child: Column(
+                      //
                       children: [
                         const SizedBox(height: 100), //
                         _buildLogo(), //
                         const SizedBox(height: 20), //
                         _buildTitle(), //
                         const SizedBox(height: 20), //
-                        _buildRoleSubTitle(actualRole), // استخدام العنوان الفرعي الجديد بناءً على الدور
+                        _buildRoleSubTitle(
+                            actualRole), // استخدام العنوان الفرعي الجديد بناءً على الدور
                         const SizedBox(height: 5), //
                         _buildSubTitle2(), // (يظل كما هو)
                         const SizedBox(height: 80), //
                         // تم الاحتفاظ بهذه الـ Widgets كما هي بناءً على طلبك
-                        EmailField( //
+                        EmailField(
+                          //
                           controller: _controller, //
                           riveHelper: riveHelper, //
                           emailController: emailController, //
                         ),
                         const SizedBox(height: 10), //
-                        PasswordField( //
+                        PasswordField(
+                          //
                           controller: _controller, //
                           riveHelper: riveHelper, //
                           isObscureText: isObscureText, //
@@ -69,7 +79,8 @@ class LoginScreen extends StatelessWidget {
                           passwordFocuseNode: passwordFocuseNode, //
                         ),
                         const SizedBox(height: 10), //
-                        ElevatedButton( //
+                        ElevatedButton(
+                          //
                           onPressed: () async {
                             // تمرير الدور إلى دالة تسجيل الدخول
                             final success = await _controller.login(
@@ -104,7 +115,8 @@ class LoginScreen extends StatelessWidget {
                           },
                           child: Text(
                             'العودة لاختيار الدور'.tr,
-                            style: AppTextStyles.bodyText.copyWith(color: AppColors.accentColor), //
+                            style: AppTextStyles.bodyText
+                                .copyWith(color: AppColors.secondary), //
                           ),
                         ),
                       ],
@@ -117,17 +129,22 @@ class LoginScreen extends StatelessWidget {
         ));
   }
 
-  Widget _buildLogo() { //
-    return SvgPicture.asset( //
+  Widget _buildLogo() {
+    //
+    return SvgPicture.asset(
+      //
       'assets/images/login_screen/Vector.svg', //
       height: 150, //
       width: 150, //
     );
   }
 
-  Widget _buildTitle() { //
-    return Stack( //
-      children: [ //
+  Widget _buildTitle() {
+    //
+    return Stack(
+      //
+      children: [
+        //
         Text('1.7'.tr, style: AppTextStyles.headline1), //
         Text('1.7'.tr, style: AppTextStyles.headline1Fill), //
       ],
@@ -135,15 +152,19 @@ class LoginScreen extends StatelessWidget {
   }
 
   // دالة العنوان الفرعي الأصلية (تم الحفاظ عليها دون تغيير)
-  Widget _buildSubTitle() { //
-    return Text( //
+  Widget _buildSubTitle() {
+    //
+    return Text(
+      //
       '1.8'.tr, //
       style: AppTextStyles.bodyText, //
     );
   }
 
-  Widget _buildSubTitle2() { //
-    return Text( //
+  Widget _buildSubTitle2() {
+    //
+    return Text(
+      //
       '1.9'.tr, //
       style: AppTextStyles.bodyText, //
     );
@@ -159,13 +180,17 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildForgotPasswordButton() { //
-    return Obx(() => TextButton( //
-          onPressed: () { //
+  Widget _buildForgotPasswordButton() {
+    //
+    return Obx(() => TextButton(
+          //
+          onPressed: () {
+            //
             _controller.textColor.value = Colors.blue; //
             _controller.navigateToForgotPassword(); //
           },
-          child: Text( //
+          child: Text(
+            //
             '1.6'.tr, //
             style: TextStyle(color: _controller.textColor.value), //
           ),

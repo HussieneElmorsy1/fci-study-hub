@@ -5,23 +5,28 @@ import 'package:cloud_firestore/cloud_firestore.dart'; // (متبقي لميزا
 import 'package:fci_app_new/app_pages/app_pages.dart'; //
 import 'package:fci_app_new/app_pages/app_routes.dart'; //
 import 'package:fci_app_new/data/api/api_service.dart'; //
-import 'package:fci_app_new/data/data_sources/remote/auth_remote_data_source.dart';
+import 'package:fci_app_new/data/datasources/remote/auth_remote_data_source.dart';
+import 'package:fci_app_new/data/datasources/remote/academic_remote_data_source.dart';
 import 'package:fci_app_new/data/providers/document_provider.dart'; //
 // تم حذف: import 'package:fci_app_new/data/services/auth_service.dart';
 import 'package:fci_app_new/domain/repository/auth_repository.dart'; //
 import 'package:fci_app_new/domain/repository/auth_repository_impl.dart'; //
+import 'package:fci_app_new/domain/repository/major_repository.dart';
+import 'package:fci_app_new/domain/repository/major_repository_impl.dart';
 import 'package:fci_app_new/domain/repository/profile_repository_impl.dart';
 import 'package:fci_app_new/domain/repository/settings_repository_impl.dart'; //
+import 'package:fci_app_new/domain/usecases/get_all_majors_use_case.dart';
 import 'package:fci_app_new/domain/usecases/login_user.dart';
 import 'package:fci_app_new/presentation/controllers/auth_controller.dart'; //
 import 'package:fci_app_new/presentation/controllers/login_controller.dart'; //
+import 'package:fci_app_new/presentation/controllers/majors_controller.dart';
 import 'package:fci_app_new/presentation/controllers/profile_controller.dart'; // // استيراد ProfileController
 import 'package:fci_app_new/domain/repository/profile_repository.dart'; // // استيراد ProfileRepository
 import 'package:fci_app_new/presentation/screens/main_home_screen.dart'; //
 import 'package:fci_app_new/presentation/screens/splash_screen.dart'; //
 import 'package:fci_app_new/core/utils/app_initializer.dart'; //
 import 'package:fci_app_new/core/utils/app_theme.dart'; //
-import 'package:fci_app_new/data/data_sources/locale/locale.dart'; //
+import 'package:fci_app_new/data/datasources/locale/locale.dart'; //
 import 'package:firebase_auth/firebase_auth.dart'; // (متبقي لميزات أخرى مثل الدردشة)
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -58,6 +63,16 @@ void main() async {
   // تسجيل ProfileRepositoryImpl
   Get.lazyPut<ProfileRepository>(
       () => ProfileRepositoryImpl(Get.find<ApiService>()));
+
+  // Global dependency injection for Majors functionality
+  Get.lazyPut<AcademicRemoteDataSource>(
+      () => AcademicRemoteDataSource(Get.find<ApiService>()));
+  Get.lazyPut<MajorRepository>(
+      () => MajorRepositoryImpl(Get.find<AcademicRemoteDataSource>()));
+  Get.lazyPut<GetAllMajorsUseCase>(
+      () => GetAllMajorsUseCase(Get.find<MajorRepository>()));
+  Get.lazyPut<MajorsController>(
+      () => MajorsController(Get.find<GetAllMajorsUseCase>()));
 
   // لا نحتاج لـ lazyPut ProfileController هنا، سيتم تهيئته عبر ProfileBinding
   // Get.lazyPut<ProfileController>(() => ProfileController(Get.find<ProfileRepository>(), Get.find<AuthRepository>()));

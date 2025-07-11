@@ -942,6 +942,178 @@
 					"response": []
 				}
 			]
+		},
+		{
+			"name": "Material Folder",
+			"item": [
+				{
+					"name": "Create Material Folder",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "name",
+									"value": "محاضرات",
+									"type": "text"
+								},
+								{
+									"key": "courseId",
+									"value": "1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}material-folder",
+							"host": [
+								"{{base_url}}material-folder"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Materail Folders",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{base_url}}material-folder",
+							"host": [
+								"{{base_url}}material-folder"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Course Material Folders",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{base_url}}material-folder/1",
+							"host": [
+								"{{base_url}}material-folder"
+							],
+							"path": [
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Manage Upload Materials",
+			"item": [
+				{
+					"name": "Uploud Course Material With Folder id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "postman-cloud:///1efdb26b-7712-4320-a676-ae67ed2835f2"
+								},
+								{
+									"key": "name",
+									"value": "lecture 1",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{base_url}}material-file/1/upload",
+							"host": [
+								"{{base_url}}material-file"
+							],
+							"path": [
+								"1",
+								"upload"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Files In Folder",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{base_url}}material-file/by-folder/1",
+							"host": [
+								"{{base_url}}material-file"
+							],
+							"path": [
+								"by-folder",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"auth": {

@@ -1,21 +1,20 @@
+// lib/presentation/screens/pdf_viewer_screen.dart
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
+// import 'package:provider/provider.dart'; // هذا المستورد لن يكون مطلوباً إذا تم تحويل منطق التنزيل إلى GetX
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
-import '../../data/models/pdf_document.dart';
-import '../../data/providers/document_provider.dart';
+import 'package:fci_app_new/data/models/material_item_model.dart'; //
+// import '../../data/providers/document_provider.dart'; // هذا المستورد لن يكون مطلوباً
 
 class PdfViewerScreen extends StatefulWidget {
-  final PdfDocument document;
-  final String collectionId;
+  final MaterialItemModel material; //
 
   const PdfViewerScreen({
     Key? key,
-    required this.document,
-    required this.collectionId,
+    required this.material,
   }) : super(key: key);
 
   @override
@@ -23,7 +22,7 @@ class PdfViewerScreen extends StatefulWidget {
 }
 
 class _PdfViewerScreenState extends State<PdfViewerScreen> {
-  String? _localPath;
+  String? _finalPathToDisplay; // المسار النهائي لعرضه (سواء كان محلياً أو URL)
   bool _isLoading = true;
   String _errorMessage = '';
   final GlobalKey<SfPdfViewerState> _pdfViewerKey = GlobalKey();
@@ -34,88 +33,72 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
   @override
   void initState() {
     super.initState();
-    _isFavorite = widget.document.isFavorite;
-    _isDownloaded = widget.document.isDownloaded;
+    _isFavorite = widget.material.isFavorite; //
+    _isDownloaded = widget.material.isDownloaded; //
     _pdfController = PdfViewerController();
-    _downloadPdf();
+    _loadPdf(); // دالة جديدة لتعالج تحميل الـ PDF من asset أو network
   }
 
-  Future<void> _downloadPdf() async {
+  Future<void> _loadPdf() async {
     setState(() {
       _isLoading = true;
       _errorMessage = '';
     });
 
     try {
-      if (widget.document.url.startsWith('http')) {
-        final response = await http.get(Uri.parse(widget.document.url));
+      final String sourceUrl = widget.material.url; //
+
+      if (sourceUrl.startsWith('http://') || sourceUrl.startsWith('https://')) {
+        // إذا كان رابط شبكة، قم بمحاولة التنزيل أولاً
+        final response = await http.get(Uri.parse(sourceUrl));
 
         if (response.statusCode == 200) {
           final dir = await getTemporaryDirectory();
-          final filePath = '${dir.path}/${widget.document.title}.pdf';
+          final filePath = '${dir.path}/${widget.material.id}.pdf'; //
           final file = File(filePath);
           await file.writeAsBytes(response.bodyBytes);
 
+          // منطق تحديث حالة isDownloaded (يحتاج إلى ربط بالـ Controller أو Repository)
           if (!_isDownloaded) {
-            Provider.of<DocumentProvider>(context, listen: false)
-                .markAsDownloaded(widget.collectionId, widget.document.id);
+            // هنا يمكنك استدعاء GetX Controller أو Repository لتحديث حالة isDownloaded في الـ Model/Backend
             _isDownloaded = true;
           }
 
-          setState(() {
-            _localPath = filePath;
-            _isLoading = false;
-
-            // بعد تحميل الملف، روح للصفحة الأخيرة
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (widget.document.lastPage != null &&
-                  widget.document.lastPage! > 0) {
-                _pdfController.jumpToPage(widget.document.lastPage!);
-              }
-
-              Provider.of<DocumentProvider>(context, listen: false)
-                  .updateLastRead(
-                widget.collectionId,
-                widget.document.id,
-              );
-            });
-          });
+          _finalPathToDisplay = filePath; // المسار المحلي للملف الذي تم تنزيله
         } else {
-          setState(() {
-            _errorMessage = 'فشل تحميل الملف: ${response.statusCode}';
-            _isLoading = false;
-          });
+          _errorMessage = 'فشل تحميل الملف من الشبكة: ${response.statusCode}';
+          _finalPathToDisplay = sourceUrl; // العودة لاستخدام URL إذا فشل التنزيل
         }
+      } else if (sourceUrl.startsWith('assets/')) {
+        // إذا كان مسار asset محلياً
+        _finalPathToDisplay = sourceUrl;
       } else {
-        setState(() {
-          _localPath = widget.document.url;
-          _isLoading = false;
-
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (widget.document.lastPage != null &&
-                widget.document.lastPage! > 0) {
-              _pdfController.jumpToPage(widget.document.lastPage!);
-            }
-
-            Provider.of<DocumentProvider>(context, listen: false)
-                .updateLastRead(
-              widget.collectionId,
-              widget.document.id,
-            );
-          });
-        });
+        // إذا كان مسار ملف محلي (مثل /data/user/0/...)
+        final file = File(sourceUrl);
+        if (await file.exists()) {
+          _finalPathToDisplay = sourceUrl;
+        } else {
+          _errorMessage = 'مسار الملف المحلي غير صالح أو الملف غير موجود.';
+        }
       }
     } catch (e) {
+      _errorMessage = 'خطأ في تحميل الملف: $e';
+    } finally {
       setState(() {
-        _errorMessage = 'خطأ في تحميل الملف: $e';
         _isLoading = false;
+      });
+      // بعد تحميل الملف، روح للصفحة الأخيرة (إذا كانت موجودة)
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (widget.material.lastPage != null && widget.material.lastPage! > 0) { //
+          _pdfController.jumpToPage(widget.material.lastPage!); //
+        }
+        // هنا يمكنك استدعاء GetX Controller أو Repository لتحديث آخر صفحة مقروءة
       });
     }
   }
 
   void _toggleFavorite() {
-    Provider.of<DocumentProvider>(context, listen: false)
-        .toggleFavorite(widget.collectionId, widget.document.id);
+    // هذا الجزء يحتاج لربط بالـ Controller أو Repository
     setState(() {
       _isFavorite = !_isFavorite;
     });
@@ -134,7 +117,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: Text(widget.document.title),
+          title: Text(widget.material.title), //
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
           elevation: 0.5,
@@ -164,16 +147,14 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
   }
 
   Widget _buildPdfViewer() {
-    if (_localPath == null) {
+    if (_finalPathToDisplay == null) {
       return const Center(child: Text('لا يوجد ملف للعرض'));
     }
 
     try {
-      final docProvider = Provider.of<DocumentProvider>(context, listen: false);
-
-      if (_localPath!.startsWith('')) {
-        return SfPdfViewer.asset(
-          _localPath!,
+      if (_finalPathToDisplay!.startsWith('http://') || _finalPathToDisplay!.startsWith('https://')) {
+        return SfPdfViewer.network(
+          _finalPathToDisplay!,
           key: _pdfViewerKey,
           controller: _pdfController,
           enableTextSelection: true,
@@ -181,11 +162,25 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
           canShowScrollHead: true,
           canShowScrollStatus: true,
           onPageChanged: (PdfPageChangedDetails details) {
-            docProvider.updateLastPage(
-              widget.collectionId,
-              widget.document.id,
-              details.newPageNumber,
-            );
+            // هنا يمكنك استدعاء GetX Controller لتحديث آخر صفحة
+          },
+          onDocumentLoadFailed: (PdfDocumentLoadFailedDetails details) {
+            setState(() {
+              _errorMessage = 'فشل في تحميل الملف: ${details.error}';
+            });
+          },
+        );
+      } else if (_finalPathToDisplay!.startsWith('assets/')) {
+        return SfPdfViewer.asset(
+          _finalPathToDisplay!,
+          key: _pdfViewerKey,
+          controller: _pdfController,
+          enableTextSelection: true,
+          enableDoubleTapZooming: true,
+          canShowScrollHead: true,
+          canShowScrollStatus: true,
+          onPageChanged: (PdfPageChangedDetails details) {
+            // هنا يمكنك استدعاء GetX Controller لتحديث آخر صفحة
           },
           onDocumentLoadFailed: (PdfDocumentLoadFailedDetails details) {
             setState(() {
@@ -194,8 +189,9 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
           },
         );
       } else {
+        // يفترض أنه مسار ملف محلي تم تنزيله
         return SfPdfViewer.file(
-          File(_localPath!),
+          File(_finalPathToDisplay!),
           key: _pdfViewerKey,
           controller: _pdfController,
           enableTextSelection: true,
@@ -203,11 +199,7 @@ class _PdfViewerScreenState extends State<PdfViewerScreen> {
           canShowScrollHead: true,
           canShowScrollStatus: true,
           onPageChanged: (PdfPageChangedDetails details) {
-            docProvider.updateLastPage(
-              widget.collectionId,
-              widget.document.id,
-              details.newPageNumber,
-            );
+            // هنا يمكنك استدعاء GetX Controller لتحديث آخر صفحة
           },
           onDocumentLoadFailed: (PdfDocumentLoadFailedDetails details) {
             setState(() {
